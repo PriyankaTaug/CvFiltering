@@ -1,9 +1,9 @@
 name: Deploy Django to PythonAnywhere
 
 on:
-  push:
+  pull_request:
     branches:
-      - main
+      - Newdev
 
 jobs:
   deploy:
@@ -16,12 +16,10 @@ jobs:
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ssh.pythonanywhere.com
-          username: yourusername
+          username: priya100898
           key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
           script: |
-            cd ~/yourproject
-            git pull origin main
+            cd ~/CvFiltering
+            git pull origin Newdev
             source venv/bin/activate
-            pip install -r requirements.txt
-            python manage.py migrate
-            touch ~/yourusername.pythonanywhere.com_wsgi.py
+            
