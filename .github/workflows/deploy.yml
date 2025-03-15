@@ -19,7 +19,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}  # Add this in GitHub Secrets
         run: |
-          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
+          # ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
           ssh ${PA_USERNAME}@ssh.pythonanywhere.com << EOF
             cd CvFiltering  # Change this to the actual repo directory on PythonAnywhere
             git pull origin LastCICD  # Change to your correct branch
