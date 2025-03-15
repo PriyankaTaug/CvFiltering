@@ -24,7 +24,7 @@ jobs:
       - name: Deploy to PythonAnywhere
         env:
           PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
-          PA_USERNAME: yourusername
+          PA_USERNAME: priya100898
         run: |
-          curl -X POST "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/yourusername.pythonanywhere.com/reload/" \
+          curl -X POST "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/priya100898.pythonanywhere.com/reload/" \
             -H "Authorization: Token $PA_API_TOKEN"
