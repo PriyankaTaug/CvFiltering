@@ -1,25 +1,44 @@
-name: Deploy Django to PythonAnywhere
+name: Flask CI Pipeline
 
 on:
+
   pull_request:
     branches:
-      - Newdev
+      - dev
+     
 
 jobs:
-  deploy:
+  test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: SSH Deploy to PythonAnywhere
-        uses: appleboy/ssh-action@v0.1.6
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          host: ssh.pythonanywhere.com
-          username: priya100898
-          key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
-          script: |
-            cd ~/CvFiltering
-            git pull origin Newdev
-            source venv/bin/activate
-            
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          pytest  # Assuming you have test files using pytest
+
+
+deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to PythonAnywhere
+      env:
+        PA_API_TOKEN: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
+      run: |
+        curl -X POST "https://www.pythonanywhere.com/api/v0/user/priya100898/webapps/Priya100898.pythonanywhere.com.com/reload/" \
+        -H "Authorization: Token $PA_API_TOKEN"
+
