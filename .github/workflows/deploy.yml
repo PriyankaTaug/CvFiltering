@@ -21,11 +21,8 @@ jobs:
         run: |
           ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
           ssh ${PA_USERNAME}@ssh.pythonanywhere.com << EOF
-            cd your-repo-name  # Change this to the actual repo directory on PythonAnywhere
+            cd CvFiltering  # Change this to the actual repo directory on PythonAnywhere
             git pull origin LastCICD  # Change to your correct branch
             source venv/bin/activate
-            pip install -r requirements.txt
-            python manage.py migrate  # Apply database migrations
-            python manage.py collectstatic --noinput  # If using static files
             touch /var/www/${PA_USERNAME}_pythonanywhere_com_wsgi.py  # Reload web app
           EOF
