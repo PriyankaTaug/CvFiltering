@@ -1,9 +1,9 @@
-name: Deploy Django to PythonAnywhere
+name: Deploy to PythonAnywhere
 
 on:
   push:
     branches:
-      - main  # Change branch if needed
+      - LastCICD  # Deploy on push to LastCICD branch
 
 jobs:
   deploy:
@@ -13,18 +13,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v3
-        with:
-          python-version: '3.9'  # Adjust to match PythonAnywhere
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Deploy to PythonAnywhere
+      - name: Deploy to PythonAnywhere via API
         env:
-          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
-          PA_USERNAME: priya100898
+          SSH_PRIVATE_USERNAME: ${{ secrets.SSH_PRIVATE_USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          curl -X POST "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/priya100898.pythonanywhere.com/reload/" \
-            -H "Authorization: Token $PA_API_TOKEN"
+          curl -X POST -H "Authorization: Token $SSH_PRIVATE_KEY" \
+            https://www.pythonanywhere.com/api/v0/user/$SSH_PRIVATE_USERNAME/webapps/reload/
