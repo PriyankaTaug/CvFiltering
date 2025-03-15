@@ -1,0 +1,21 @@
+name: CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Deploy to PythonAnywhere
+        env:
+          API_TOKEN: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
+          DOMAIN: "priya100898.pythonanywhere.com"  # Your PythonAnywhere app domain
+        run: |
+          curl -X POST "https://www.pythonanywhere.com/api/v0/user/$USERNAME/webapps/$DOMAIN/reload/" \
+          -H "Authorization: Token $API_TOKEN"
