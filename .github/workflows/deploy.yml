@@ -1,0 +1,30 @@
+name: Deploy Django to PythonAnywhere
+
+on:
+  push:
+    branches:
+      - main  # Change branch if needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.9'  # Adjust to match PythonAnywhere
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Deploy to PythonAnywhere
+        env:
+          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
+          PA_USERNAME: priya100898
+        run: |
+          curl -X POST "https://www.pythonanywhere.com/api/v0/user/$PA_USERNAME/webapps/priya100898.pythonanywhere.com/reload/" \
+            -H "Authorization: Token $PA_API_TOKEN"
