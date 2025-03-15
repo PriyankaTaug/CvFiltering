@@ -3,7 +3,7 @@ name: Deploy to PythonAnywhere
 on:
   push:
     branches:
-      - LastCICD  # Deploy on push to LastCICD branch
+      - LastCICD  # Change to your main branch if needed
 
 jobs:
   deploy:
@@ -13,10 +13,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Deploy to PythonAnywhere via API
+      - name: Deploy to PythonAnywhere
         env:
           SSH_PRIVATE_USERNAME: ${{ secrets.SSH_PRIVATE_USERNAME }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}  # Add this in GitHub Secrets
         run: |
-          curl -X POST -H "Authorization: Token $SSH_PRIVATE_KEY" \
-            https://www.pythonanywhere.com/api/v0/user/$SSH_PRIVATE_USERNAME/webapps/reload/
+          ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
+          ssh ${PA_USERNAME}@ssh.pythonanywhere.com << EOF
+            cd your-repo-name  # Change this to the actual repo directory on PythonAnywhere
+            git pull origin LastCICD  # Change to your correct branch
+            source venv/bin/activate
+            pip install -r requirements.txt
+            python manage.py migrate  # Apply database migrations
+            python manage.py collectstatic --noinput  # If using static files
+            touch /var/www/${PA_USERNAME}_pythonanywhere_com_wsgi.py  # Reload web app
+          EOF
