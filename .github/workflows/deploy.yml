@@ -3,26 +3,32 @@ name: Deploy to PythonAnywhere
 on:
   push:
     branches:
-      - LastCICD  # Change to your main branch if needed
+      - dev  # Auto deploy when changes are pushed to 'dev'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Deploy to PythonAnywhere
-        env:
-          SSH_PRIVATE_USERNAME: ${{ secrets.SSH_PRIVATE_USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}  # Add this in GitHub Secrets
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'  # Adjust based on your project needs
+
+      - name: Install Dependencies
         run: |
-          # ssh-keyscan -H ssh.pythonanywhere.com >> ~/.ssh/known_hosts
-          ssh ${PA_USERNAME}@ssh.pythonanywhere.com << EOF
-            cd CvFiltering  # Change this to the actual repo directory on PythonAnywhere
-            git pull origin LastCICD  # Change to your correct branch
-            source venv/bin/activate
-            touch /var/www/${PA_USERNAME}_pythonanywhere_com_wsgi.py  # Reload web app
-          EOF
+          pip install -r requirements.txt  # Install dependencies
+
+      - name: Upload Code to PythonAnywhere
+        run: |
+          echo "Uploading files to PythonAnywhere..."
+          scp -r ./* ${{ secrets.PA_USERNAME }}@ssh.pythonanywhere.com:/home/${{ secrets.PA_USERNAME }}/cv_filtering
+
+      - name: Restart PythonAnywhere Web App
+        run: |
+          echo "Restarting web app on PythonAnywhere..."
+          curl -X POST -H "Authorization: Token ${{ secrets.PA_API_TOKEN }}" \
+            "https://www.pythonanywhere.com/api/v0/user/${{ secrets.PA_USERNAME }}/webapps/Priya100898.pythonanywhere.com/reload/"
